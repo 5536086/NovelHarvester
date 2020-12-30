@@ -18,9 +18,9 @@
             header-text-color: ladder(-fx-header-background, rgba(255, 255, 255, 0.87) 49%, rgba(0, 0, 0, 0.87) 50%);
         </#if>
     </#if>
-    <#else>
-        text-color: ${fontColor};
-        header-text-color: text-color;
+<#else>
+    text-color: ${fontColor};
+    header-text-color: text-color;
 </#if>
 border-color: ladder(-fx-base, rgba(255, 255, 255, 0.3) 49%, rgba(0, 0, 0, 0.3) 50%);
 hover-bg-color: #009688;

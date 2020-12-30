@@ -3,11 +3,11 @@ package com.unclezs.downloader;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.unclezs.crawl.TextNovelSpider;
 import com.unclezs.downloader.config.DownloadConfig;
 import com.unclezs.downloader.config.DownloaderState;
-import com.unclezs.gui.utils.ThemeUtil;
 import com.unclezs.model.AnalysisConfig;
 import com.unclezs.model.Article;
 import com.unclezs.model.Chapter;
@@ -66,9 +66,10 @@ public class NovelDownloader extends AbstractDownloader implements Serializable 
     public NovelDownloader(List<Chapter> chapters, DownloadConfig setting, String title, AnalysisConfig config) {
         this.chapters = chapters;
         this.setting = setting;
-        this.title = title;
+        this.title = TextUtil.removeInvalidSymbol(title);
         this.config = config;
-        this.fileName = com.unclezs.utils.FileUtil.checkExistAndRename(FileUtil.file(setting.getPath(), title), true).getName();
+        this.fileName =
+            com.unclezs.utils.FileUtil.checkExistAndRename(FileUtil.file(setting.getPath(), title), true).getName();
         this.setStartDynamic(config.getStartDynamic().get());
     }
 
@@ -98,9 +99,14 @@ public class NovelDownloader extends AbstractDownloader implements Serializable 
                         } else {
                             content = spider.content(chapter.getUrl());
                         }
+                        //没有获取到正文，则视为失败
+                        if (StrUtil.isBlank(content)) {
+                            throw new IOException();
+                        }
                         content = TextUtil.removeTitle(content, chapter.getName());
                         content = chapter.getName() + "\r\n" + content + "\r\n\r\n";
-                        String chapterFileName = setting.isMerge() ? String.valueOf(cur) : chapter.getName();
+                        String chapterFileName =
+                            setting.isMerge() ? String.valueOf(cur) : TextUtil.removeInvalidSymbol(chapter.getName());
                         FileUtil.writeUtf8String(content, FileUtil.file(saveFile, chapterFileName + ".txt"));
                         ThreadUtil.sleep(setting.getDelay(), TimeUnit.SECONDS);
                     } catch (IOException e) {
@@ -127,7 +133,8 @@ public class NovelDownloader extends AbstractDownloader implements Serializable 
      * 合并文件,将多线程下载的多个文件合并成为一本小说
      */
     private void merge() {
-        File file = com.unclezs.utils.FileUtil.checkExistAndRename(FileUtil.file(saveFile.getParent(), getTitle().concat(".txt")), true);
+        File file = com.unclezs.utils.FileUtil.checkExistAndRename(
+            FileUtil.file(saveFile.getParent(), getTitle().concat(".txt")), true);
         String[] acceptFile = saveFile.list((dir, name) -> name.endsWith(".txt"));
         if (acceptFile != null) {
             //按名字排序

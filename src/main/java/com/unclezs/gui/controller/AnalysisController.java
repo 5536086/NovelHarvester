@@ -115,17 +115,17 @@ public class AnalysisController implements LifeCycleFxController {
         chapterContentTextArea.visibleProperty().bind(chapterListView.visibleProperty());
         engine = webView.getEngine();
         engine.getLoadWorker().stateProperty().addListener(
-                (ov, oldState, newState) -> {
-                    if (newState == Worker.State.SUCCEEDED) {
-                        ThreadUtil.execute(() -> {
-                            ThreadUtil.sleep(5000);
-                            Platform.runLater(() -> {
-                                html = engine.executeScript("document.documentElement.outerHTML").toString();
-                                webViewLoading = false;
-                            });
+            (ov, oldState, newState) -> {
+                if (newState == Worker.State.SUCCEEDED) {
+                    ThreadUtil.execute(() -> {
+                        ThreadUtil.sleep(5000);
+                        Platform.runLater(() -> {
+                            html = engine.executeScript("document.documentElement.outerHTML").toString();
+                            webViewLoading = false;
                         });
-                    }
-                });
+                    });
+                }
+            });
         engine.setJavaScriptEnabled(true);
         engine.setUserAgent(RequestUtil.USER_AGENT);
         engine.setOnError(e -> webViewLoading = false);
@@ -155,7 +155,8 @@ public class AnalysisController implements LifeCycleFxController {
         if (StrUtil.isNotEmpty(config.getCookies().get())) {
             try {
                 Map<String, List<String>> headers = new LinkedHashMap<>();
-                headers.put("Set-Cookie", Arrays.stream(config.getCookies().get().split(";")).collect(Collectors.toList()));
+                headers.put("Set-Cookie",
+                    Arrays.stream(config.getCookies().get().split(";")).collect(Collectors.toList()));
                 java.net.CookieHandler.getDefault().put(URI.create(url), headers);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -325,7 +326,8 @@ public class AnalysisController implements LifeCycleFxController {
      * 初始化解析配置
      */
     private void initAnalysisConfig() {
-        ruleGroup.selectedToggleProperty().addListener(l -> config.getRule().set(Integer.parseInt(ruleGroup.getSelectedToggle().getUserData().toString())));
+        ruleGroup.selectedToggleProperty().addListener(
+            l -> config.getRule().set(Integer.parseInt(ruleGroup.getSelectedToggle().getUserData().toString())));
         ads.textProperty().bindBidirectional(config.getAdStr());
         userAgent.textProperty().bindBidirectional(config.getUserAgent());
         cookiesText.textProperty().bindBidirectional(config.getCookies());
@@ -370,8 +372,11 @@ public class AnalysisController implements LifeCycleFxController {
             ToastUtil.error("保存路径不存在，请在设置里面修改");
             return;
         }
-        List<Chapter> selectedChapters = chapterListView.getItems().stream().filter(CheckBox::isSelected).map(i -> new Chapter(i.getText(), i.getUserData().toString())).collect(Collectors.toList());
-        NovelDownloader downloader = new NovelDownloader(selectedChapters, new DownloadConfig(DataManager.application.getSetting()), this.spider.getTitle(), BeanUtil.copy(config, AnalysisConfig.class));
+        List<Chapter> selectedChapters = chapterListView.getItems().stream().filter(CheckBox::isSelected).map(
+            i -> new Chapter(i.getText(), i.getUserData().toString())).collect(Collectors.toList());
+        NovelDownloader downloader =
+            new NovelDownloader(selectedChapters, new DownloadConfig(DataManager.application.getSetting()),
+                this.spider.getTitle(), BeanUtil.copy(config, AnalysisConfig.class));
         ContentUtil.getController(DownloadController.class).addTask(downloader);
         ToastUtil.success("添加下载任务成功！");
     }

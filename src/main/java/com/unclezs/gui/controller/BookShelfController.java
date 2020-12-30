@@ -152,7 +152,8 @@ public class BookShelfController implements LifeCycleFxController {
         AbstractLoadingTask<List<BookNode>> task = new AbstractLoadingTask<List<BookNode>>() {
             @Override
             protected List<BookNode> call() {
-                return MybatisUtil.execute(BookMapper.class, m -> m.selectList(null)).stream().map(BookNode::new).collect(Collectors.toList());
+                return MybatisUtil.execute(BookMapper.class, m -> m.selectList(null)).stream().map(
+                    BookNode::new).collect(Collectors.toList());
             }
         };
         task.setSuccessHandler(e -> {
@@ -201,8 +202,8 @@ public class BookShelfController implements LifeCycleFxController {
             return Collections.emptyList();
         }
         List<Chapter> update = chapters.stream()
-                .filter(c -> !loader.getConfig().getBlackList().contains(c.getUrl()))
-                .collect(Collectors.toList());
+            .filter(c -> !loader.getConfig().getBlackList().contains(c.getUrl()))
+            .collect(Collectors.toList());
         List<Chapter> newChapters = update.subList(loader.chapters().size(), update.size());
         loader.chapters().addAll(newChapters);
         loader.store();
@@ -230,7 +231,8 @@ public class BookShelfController implements LifeCycleFxController {
                 String cover = ApplicationUtil.saveImage(path, selectedBook.getName());
                 selectedNode.getCover().setImage(new Image("file:" + cover));
                 selectedBook.setCover(cover);
-                ThreadUtil.execute(() -> MybatisUtil.execute(BookMapper.class, mapper -> mapper.updateById(selectedBook)));
+                ThreadUtil.execute(
+                    () -> MybatisUtil.execute(BookMapper.class, mapper -> mapper.updateById(selectedBook)));
             } catch (IOException ignored) {
             }
         });
@@ -257,6 +259,11 @@ public class BookShelfController implements LifeCycleFxController {
      * 打开阅读器
      */
     public void open() {
+        if (!FileUtil.exist(selectedBook.getChapterPath())) {
+            log.warn("文本小说【{}】文件不存在", selectedBook.getName());
+            ToastUtil.error("书籍不存在");
+            return;
+        }
         NovelLoader loader;
         if (selectedBook.isWeb()) {
             loader = new WebNovelLoader();
@@ -307,7 +314,8 @@ public class BookShelfController implements LifeCycleFxController {
         loader.load(selectedBook);
         WebNovelLoader.Config config = loader.getConfig();
         DownloadConfig setting = new DownloadConfig(DataManager.application.getSetting());
-        NovelDownloader downloader = new NovelDownloader(loader.chapters(), setting, selectedBook.getName(), config.getRule());
+        NovelDownloader downloader =
+            new NovelDownloader(loader.chapters(), setting, selectedBook.getName(), config.getRule());
         ContentUtil.getController(DownloadController.class).addTask(downloader);
         ToastUtil.success("添加下载成功");
     }
@@ -318,7 +326,8 @@ public class BookShelfController implements LifeCycleFxController {
      * @throws IOException /
      */
     public void toAudio() throws IOException {
-        TTSDownloader downloader = new TTSDownloader(selectedBook, DataManager.application.getSetting().getSavePath().get());
+        TTSDownloader downloader =
+            new TTSDownloader(selectedBook, DataManager.application.getSetting().getSavePath().get());
         ContentUtil.getController(DownloadController.class).addTask(downloader);
         ToastUtil.success("添加文本转语音任务成功");
     }

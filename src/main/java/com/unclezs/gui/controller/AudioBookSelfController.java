@@ -8,13 +8,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.jfoenix.controls.*;
 import com.unclezs.crawl.AudioNovelSpider;
 import com.unclezs.downloader.AudioDownloader;
-import com.unclezs.mapper.AudioBookMapper;
-import com.unclezs.model.AudioBook;
-import com.unclezs.model.Setting;
 import com.unclezs.gui.components.AbstractLoadingTask;
 import com.unclezs.gui.components.AudioBookNode;
 import com.unclezs.gui.extra.FXController;
 import com.unclezs.gui.utils.*;
+import com.unclezs.mapper.AudioBookMapper;
+import com.unclezs.model.AudioBook;
+import com.unclezs.model.Setting;
 import com.unclezs.utils.MybatisUtil;
 import com.unclezs.utils.RequestUtil;
 import com.unclezs.utils.TimeUtil;
@@ -153,7 +153,9 @@ public class AudioBookSelfController implements LifeCycleFxController {
         Task<List<AudioBookNode>> task = new Task<List<AudioBookNode>>() {
             @Override
             protected List<AudioBookNode> call() {
-                List<AudioBookNode> bookNodes = MybatisUtil.execute(AudioBookMapper.class, mapper -> mapper.selectList(Wrappers.<AudioBook>lambdaQuery().orderByDesc(AudioBook::getUpdateTime))).stream().map(AudioBookNode::new).collect(Collectors.toList());
+                List<AudioBookNode> bookNodes = MybatisUtil.execute(AudioBookMapper.class, mapper -> mapper.selectList(
+                    Wrappers.<AudioBook>lambdaQuery().orderByDesc(AudioBook::getUpdateTime))).stream().map(
+                    AudioBookNode::new).collect(Collectors.toList());
                 if (bookNodes.size() > 0) {
                     book = bookNodes.get(0).getInfo();
                 }
@@ -310,18 +312,20 @@ public class AudioBookSelfController implements LifeCycleFxController {
                 //进度绑定
                 mediaPlayer.currentTimeProperty().addListener(ev -> {
                     if (mediaPlayer.getCurrentTime().lessThanOrEqualTo(mediaPlayer.getTotalDuration())) {
-                        progressText.setText(TimeUtil.secondToTime(mediaPlayer.getCurrentTime().toSeconds()) + "/" + TimeUtil.secondToTime(mediaPlayer.getTotalDuration().toSeconds()));
+                        progressText.setText(TimeUtil.secondToTime(mediaPlayer.getCurrentTime().toSeconds()) + "/"
+                            + TimeUtil.secondToTime(mediaPlayer.getTotalDuration().toSeconds()));
                         if (!progress.isValueChanging()) {
-                            progress.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds());
+                            progress.setValue(
+                                mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds());
                             book.setLastTime(progress.getValue());
                         }
                     }
                 });
                 progress.setValueFactory(slider ->
-                        Bindings.createStringBinding(
-                                () -> TimeUtil.secondToTime(mediaPlayer.getTotalDuration().toSeconds() * slider.getValue()),
-                                slider.valueProperty()
-                        )
+                    Bindings.createStringBinding(
+                        () -> TimeUtil.secondToTime(mediaPlayer.getTotalDuration().toSeconds() * slider.getValue()),
+                        slider.valueProperty()
+                    )
                 );
                 //进度条点击
                 progress.valueProperty().addListener(ev -> {
@@ -480,7 +484,9 @@ public class AudioBookSelfController implements LifeCycleFxController {
             };
             task.setSuccessHandler(e -> {
                 try {
-                    AudioDownloader downloader = new AudioDownloader(setting.getThreadNum().get(), setting.getDelay().get(), setting.getSavePath().get(), selectedBook);
+                    AudioDownloader downloader =
+                        new AudioDownloader(setting.getThreadNum().get(), setting.getDelay().get(),
+                            setting.getSavePath().get(), selectedBook);
                     ContentUtil.getController(DownloadController.class).addTask(downloader);
                     ToastUtil.success("添加下载成功");
                 } catch (IOException ex) {
@@ -517,7 +523,8 @@ public class AudioBookSelfController implements LifeCycleFxController {
                 chapterBox.setText("");
             }
             bookListView.getItems().remove(item);
-            ThreadUtil.execute(() -> MybatisUtil.execute(AudioBookMapper.class, mapper -> mapper.deleteById(item.getInfo().getId())));
+            ThreadUtil.execute(
+                () -> MybatisUtil.execute(AudioBookMapper.class, mapper -> mapper.deleteById(item.getInfo().getId())));
             ToastUtil.success("已移除");
         }
     }

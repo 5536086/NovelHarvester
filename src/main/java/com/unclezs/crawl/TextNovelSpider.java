@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.unclezs.constrant.Charsets;
 import com.unclezs.crawl.special.Po18;
@@ -55,7 +54,7 @@ public class TextNovelSpider implements Serializable, NovelSpider {
      * 特殊网站
      */
     public static final List<String> specialSite = ListUtil.list(false,
-            "po18"
+        "po18"
     );
     private static final long serialVersionUID = 1L;
     /**
@@ -73,11 +72,14 @@ public class TextNovelSpider implements Serializable, NovelSpider {
     /**
      * 正文规则1
      */
-    private static Pattern CONTENT_RULE_1 = Pattern.compile("[pvri\\-/\"]>([^字<*][\\pP\\w\\pN\\pL\\pM" + UNICODE_AZAZ09 + CHINESE + CH_PUNCTUATION + "]{3,}[^字\\w>]{0,2})(<br|</p|</d|<p|<!|<d|</li)", Pattern.CASE_INSENSITIVE);
+    private static Pattern CONTENT_RULE_1 = Pattern.compile(
+        "[pvri\\-/\"]>([^字<*][\\pP\\w\\pN\\pL\\pM" + UNICODE_AZAZ09 + CHINESE + CH_PUNCTUATION
+            + "]{3,}[^字\\w>]{0,2})(<br|</p|</d|<p|<!|<d|</li)", Pattern.CASE_INSENSITIVE);
     /**
      * 正文规则2
      */
-    private static Pattern CONTENT_RULE_2 = Pattern.compile("([^/][\\s\\S]*?>)([\\s\\S]*?)(<)", Pattern.CASE_INSENSITIVE);
+    private static Pattern CONTENT_RULE_2 =
+        Pattern.compile("([^/][\\s\\S]*?>)([\\s\\S]*?)(<)", Pattern.CASE_INSENSITIVE);
 
     private AnalysisConfig config;
     @JSONField(serialize = false)
@@ -154,9 +156,12 @@ public class TextNovelSpider implements Serializable, NovelSpider {
      */
     private HttpRequest sendSearchRequest(String keyword, SearchTextRule rule) {
         if (StrUtil.isNotEmpty(rule.getSearchKey())) {
-            return RequestUtil.execute(rule.getSearchLink(), Dict.create().set(rule.getSearchKey(), keyword), rule.getMethod(), false, null, rule.getCharset());
+            return RequestUtil.execute(rule.getSearchLink(), Dict.create().set(rule.getSearchKey(), keyword),
+                rule.getMethod(), false, null, rule.getCharset());
         } else {
-            return RequestUtil.execute(rule.getSearchLink() + cn.hutool.core.net.URLEncoder.createDefault().encode(keyword, Charset.forName(rule.getCharset())), null, rule.getMethod(), false, null, rule.getCharset());
+            return RequestUtil.execute(
+                rule.getSearchLink() + cn.hutool.core.net.URLEncoder.createDefault().encode(keyword,
+                    Charset.forName(rule.getCharset())), null, rule.getMethod(), false, null, rule.getCharset());
         }
     }
 
@@ -181,15 +186,15 @@ public class TextNovelSpider implements Serializable, NovelSpider {
                 Matcher m2 = CONTENT_RULE_2.matcher(html);
                 while (m2.find()) {
                     boolean pass = (Pattern.matches("[\\s\\S]*?[^字\\w<*][" + CHINESE + "]+[\\s\\S]*?", m2.group(2))
-                            || Pattern.matches("[\\s\\S]*?&#\\d{4,5}[\\s\\S]*?", m2.group(2)))
-                            && (m2.group(1).endsWith("br />")
-                            || m2.group(1).endsWith("br/>")
-                            || m2.group(1).endsWith("br>")
-                            || m2.group(1).endsWith("abc\">")
-                            || m2.group(1).endsWith("p>")
-                            || m2.group(1).endsWith("v>")
-                            || m2.group(1).endsWith("->"))
-                            && m2.group(2).replaceAll("&[#\\w]{3,6}[;:]?", " ").trim().length() > 0;
+                        || Pattern.matches("[\\s\\S]*?&#\\d{4,5}[\\s\\S]*?", m2.group(2)))
+                        && (m2.group(1).endsWith("br />")
+                        || m2.group(1).endsWith("br/>")
+                        || m2.group(1).endsWith("br>")
+                        || m2.group(1).endsWith("abc\">")
+                        || m2.group(1).endsWith("p>")
+                        || m2.group(1).endsWith("v>")
+                        || m2.group(1).endsWith("->"))
+                        && m2.group(2).replaceAll("&[#\\w]{3,6}[;:]?", " ").trim().length() > 0;
                     if (pass) {
                         content.append(m2.group(2).replaceAll("&[#\\w]{3,6}[;:]?", " ")).append("\r\n");
                     }
@@ -200,9 +205,9 @@ public class TextNovelSpider implements Serializable, NovelSpider {
                 whitelist.addTags("p", "br", "div");
                 String parse = Jsoup.clean(html, whitelist);
                 parse = parse.replaceAll("&[#\\w]{3,6}[;:]?", "{空格}")
-                        .replaceAll("<.*?br.*>", "{换行}")
-                        .replaceAll("(\n|\r\n|<.*?p.*?>)", "{换行}")
-                        .replace("　", "");
+                    .replaceAll("<.*?br.*>", "{换行}")
+                    .replaceAll("(\n|\r\n|<.*?p.*?>)", "{换行}")
+                    .replace("　", "");
                 Document document = Jsoup.parse(parse);
                 Elements divs = document.select("div");
                 String text = "";
@@ -259,7 +264,7 @@ public class TextNovelSpider implements Serializable, NovelSpider {
      * @return /
      */
     public List<Chapter> chaptersByHtml(String html, String url) {
-        //自定义范围
+        // 自定义范围
         if (config.getRule().get() == 1 || config.getRule().get() == 2) {
             html = TextUtil.getDelHtml(config.getChapterHead().get(), config.getChapterTail().get(), html);
         }
@@ -271,7 +276,9 @@ public class TextNovelSpider implements Serializable, NovelSpider {
         if (config.getChapterFilter().get()) {
             filterLinks(elements);
         }
-        CopyOnWriteArrayList<Chapter> chapters = elements.stream().map(a -> new Chapter(a.text(), a.attr(LINK_ATTR))).collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+        CopyOnWriteArrayList<Chapter> chapters =
+            elements.stream().map(a -> new Chapter(a.text(), a.attr(LINK_ATTR))).collect(
+                Collectors.toCollection(CopyOnWriteArrayList::new));
         //去重
         removeDuplicates(chapters);
         //乱序重排
@@ -308,7 +315,8 @@ public class TextNovelSpider implements Serializable, NovelSpider {
         final int depth = findMax(as, a -> a.parents().size());
         final int part = findMax(as, a -> a.attr(LINK_ATTR).split("/").length);
         as.forEach(a -> {
-            if (a.parents().size() != depth || !UrlUtil.notAnchor(a.attr(LINK_ATTR)) || part != a.attr(LINK_ATTR).split("/").length || !a.hasText()) {
+            if (a.parents().size() != depth || !UrlUtil.notAnchor(a.attr(LINK_ATTR)) || part != a.attr(LINK_ATTR).split(
+                "/").length || !a.hasText()) {
                 as.remove(a);
             }
         });

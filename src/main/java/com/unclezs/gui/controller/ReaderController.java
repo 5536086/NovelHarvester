@@ -207,10 +207,11 @@ public class ReaderController {
             changeContentStyle();
         });
         //行间距
-        Platform.runLater(() -> lineSpaceSlider.valueProperty().bindBidirectional(DataManager.application.getReaderConfig().getLineSpacing()));
+        Platform.runLater(() -> lineSpaceSlider.valueProperty().bindBidirectional(
+            DataManager.application.getReaderConfig().getLineSpacing()));
         //中文字体
         String[] strings = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-//        List<String> families = Arrays.stream(strings).filter(f -> f.matches("[\\u4e00-\\u9fa5]+")).collect(Collectors.toList());
+        //List<String> families = Arrays.stream(strings).filter(f -> f.matches("[\\u4e00-\\u9fa5]+")).collect(Collectors.toList());
         List<String> families = Arrays.stream(strings).collect(Collectors.toList());
         fonts.getItems().setAll(families);
         fonts.valueProperty().bindBidirectional(DataManager.application.getReaderConfig().getFontFamily());
@@ -219,12 +220,15 @@ public class ReaderController {
             changeContentStyle();
         });
         //页面宽度
-        Platform.runLater(() -> pageWidthSlider.valueProperty().bindBidirectional(DataManager.application.getReaderConfig().getPageWidth()));
-        pageWidthSlider.setValueFactory(slider -> Bindings.createStringBinding(() -> (int) slider.getValue() + "%", slider.valueProperty()));
+        Platform.runLater(() -> pageWidthSlider.valueProperty().bindBidirectional(
+            DataManager.application.getReaderConfig().getPageWidth()));
+        pageWidthSlider.setValueFactory(
+            slider -> Bindings.createStringBinding(() -> (int) slider.getValue() + "%", slider.valueProperty()));
         //焦点获取
         catalogDrawer.setOnDrawerClosed(e -> contentScrollPane.requestFocus());
         //章节切换
-        chapterSlider.setValueFactory(slider -> Bindings.createStringBinding(() -> ((int) slider.getValue() + 1) + "/" + ((int) slider.getMax() + 1), slider.valueProperty()));
+        chapterSlider.setValueFactory(slider -> Bindings.createStringBinding(
+            () -> ((int) slider.getValue() + 1) + "/" + ((int) slider.getMax() + 1), slider.valueProperty()));
         currentIndexListener = (observable, oldValue, newValue) -> {
             String name = loader.chapters().get(currentIndex.get()).getName();
             Reader.stage.setTitle(name);
@@ -329,7 +333,8 @@ public class ReaderController {
         Reader.stage.setTitle(book.getName());
         //恢复到上次的位置
         String[] nodesIndex = this.book.getReadingChapter().split(",");
-        for (int i = Integer.parseInt(nodesIndex[0]); i < Integer.parseInt(nodesIndex[0]) + Integer.parseInt(nodesIndex[1]); i++) {
+        for (int i = Integer.parseInt(nodesIndex[0]);
+             i < Integer.parseInt(nodesIndex[0]) + Integer.parseInt(nodesIndex[1]); i++) {
             Chapter chapter = loader.chapters().get(i);
             contentBox.getChildren().add(createChapterNodes(chapter.getName(), loader.content(i), i));
         }
@@ -376,7 +381,8 @@ public class ReaderController {
                 ContentNode node = (ContentNode) contentBox.getChildren().remove(contentBox.getChildren().size() - 1);
                 cacheNodes.push(node);
             }
-            contentBox.getChildren().add(0, createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
+            contentBox.getChildren().add(0,
+                createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
         } else {
             if (contentBox.getChildren().size() >= CACHE_PAGE) {
                 double height = contentBox.getHeight();
@@ -390,11 +396,13 @@ public class ReaderController {
                     }
                     Platform.runLater(() -> {
                         contentScrollPane.setVvalue(1);
-                        contentBox.getChildren().add(createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
+                        contentBox.getChildren().add(
+                            createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
                     });
                 });
             } else {
-                contentBox.getChildren().add(createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
+                contentBox.getChildren().add(
+                    createChapterNodes(loader.chapters().get(chapterIndex).getName(), content, chapterIndex));
             }
         }
     }
@@ -436,7 +444,8 @@ public class ReaderController {
                     break;
                 }
             }
-            Platform.runLater(() -> contentScrollPane.setVvalue(contentBox.getChildren().get(1).getLayoutY() / contentBox.getLayoutBounds().getHeight()));
+            Platform.runLater(() -> contentScrollPane.setVvalue(
+                contentBox.getChildren().get(1).getLayoutY() / contentBox.getLayoutBounds().getHeight()));
         });
 
     }
@@ -457,7 +466,8 @@ public class ReaderController {
      * 下一章 上下相接
      */
     private void nextSmooth() {
-        currentIndex.set(((ContentNode) contentBox.getChildren().get(contentBox.getChildren().size() - 1)).getChapterIndex() + 1);
+        currentIndex.set(
+            ((ContentNode) contentBox.getChildren().get(contentBox.getChildren().size() - 1)).getChapterIndex() + 1);
     }
 
     /**
@@ -491,7 +501,7 @@ public class ReaderController {
             nightTheme.setSelected(true);
         }
         ThemeUtil.setCss(Dict.create().set("bgColor", fill),
-                Reader.stage.getScene(), "css/reader.ftl", "/theme/reader.css");
+            Reader.stage.getScene(), "css/reader.ftl", "/theme/reader.css");
         DataManager.application.getReaderConfig().getBgColor().set(fill);
     }
 
@@ -510,8 +520,12 @@ public class ReaderController {
      * 更改内容样式
      */
     private void changeContentStyle() {
-        styleFont.set(String.format("-fx-font-size: %spx;-fx-font-family: '%s'", DataManager.application.getReaderConfig().getFontSize().get(), ChineseFont.getFont(DataManager.application.getReaderConfig().getFontFamily().get())));
-        styleTileFont.set(String.format("-fx-font-size: %spx;-fx-font-family: '%s'", DataManager.application.getReaderConfig().getFontSize().get() + 12, DataManager.application.getReaderConfig().getFontFamily().get()));
+        styleFont.set(String.format("-fx-font-size: %spx;-fx-font-family: '%s'",
+            DataManager.application.getReaderConfig().getFontSize().get(),
+            ChineseFont.getFont(DataManager.application.getReaderConfig().getFontFamily().get())));
+        styleTileFont.set(String.format("-fx-font-size: %spx;-fx-font-family: '%s'",
+            DataManager.application.getReaderConfig().getFontSize().get() + 12,
+            DataManager.application.getReaderConfig().getFontFamily().get()));
     }
 
     /**
@@ -529,21 +543,19 @@ public class ReaderController {
      * 设置背景图
      */
     private void setBgImage() {
-        Reader.root.setStyle(String.format("-fx-background-image: url('%s')", DataManager.application.getReaderConfig().getBgImage().get()));
+        Reader.root.setStyle(String.format("-fx-background-image: url('%s')",
+            DataManager.application.getReaderConfig().getBgImage().get()));
     }
 
     public void exit() {
-        Platform.setImplicitExit(true);
         Reader.stage.hide();
+        App.stage.show();
     }
 
     /**
      * 返回主页
      */
     public void onHidden() {
-        if (!Platform.isImplicitExit()) {
-            return;
-        }
         //取消监听
         currentIndex.removeListener(currentIndexListener);
         //初始化朗读
@@ -559,7 +571,9 @@ public class ReaderController {
             }
         }
         this.book.setLocation(contentScrollPane.getVvalue());
-        this.book.setReadingChapter(String.format("%s,%s", ((ContentNode) contentBox.getChildren().get(0)).getChapterIndex(), contentBox.getChildren().size()));
+        this.book.setReadingChapter(
+            String.format("%s,%s", ((ContentNode) contentBox.getChildren().get(0)).getChapterIndex(),
+                contentBox.getChildren().size()));
         currentIndex.set(-1);
         //保存入库
         ThreadUtil.execute(() -> {
@@ -575,7 +589,6 @@ public class ReaderController {
         //显示主窗口
         catalogDrawer.close();
         settingDrawer.close();
-        App.stage.show();
     }
 
 
@@ -583,7 +596,7 @@ public class ReaderController {
      * 显示隐藏头部
      */
     public void toggleHeader() {
-        if (Reader.root.header().getChildren().size() == 0) {
+        if (Reader.root.header().getChildren().isEmpty()) {
             hiddenBtn.setText("隐藏状态栏");
             Reader.root.showHeader();
             DataManager.application.getReaderConfig().setHeader(true);
@@ -692,7 +705,9 @@ public class ReaderController {
                 break;
             case SPACE:
             case PAGE_DOWN: {
-                double v = (contentScrollPane.getViewportBounds().getHeight() / contentBox.getLayoutBounds().getHeight()) * 0.9 + contentScrollPane.getVvalue();
+                double v =
+                    (contentScrollPane.getViewportBounds().getHeight() / contentBox.getLayoutBounds().getHeight()) * 0.9
+                        + contentScrollPane.getVvalue();
                 if (v > 1) {
                     contentScrollPane.setVvalue(1);
                     break;
@@ -702,7 +717,9 @@ public class ReaderController {
                 break;
             }
             case PAGE_UP: {
-                double v = contentScrollPane.getVvalue() - (contentScrollPane.getViewportBounds().getHeight() / contentBox.getLayoutBounds().getHeight()) * 0.9;
+                double v = contentScrollPane.getVvalue()
+                    - (contentScrollPane.getViewportBounds().getHeight() / contentBox.getLayoutBounds().getHeight())
+                    * 0.9;
                 if (v < 0) {
                     contentScrollPane.setVvalue(0);
                     break;

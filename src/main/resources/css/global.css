@@ -2,11 +2,11 @@
 @import "components/table-view.css";
 @import "bootstrap.css";
 
-
-.root{
-    -fx-font-family: "Microsoft YaHei UI";
-    /*-fx-font-weight: BOLD;*/
+.root {
+    -fx-font-size: 13px;
+    -fx-font-family: "Menlo", "Microsoft YaHei UI", sans-serif;
 }
+
 .glyph-font {
     -fx-font-family: FontAwesome !important;
 }
@@ -23,7 +23,7 @@
     -fx-border-color: #000;
 }
 
-.jfx-toggle-button *{
+.jfx-toggle-button * {
     -fx-background-insets: 0 !important;
     -fx-padding: 0 !important;
 }
@@ -151,7 +151,7 @@
 
 .list-view .list-cell:selected {
     -fx-background-color: selected-bg-color;
-    -fx-text-fill: selected-text-color !important;
+    -fx-text-fill: selected-text-color;
 }
 
 /*context-view*/

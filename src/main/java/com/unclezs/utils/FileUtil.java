@@ -3,6 +3,7 @@ package com.unclezs.utils;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
+import cn.hutool.system.oshi.OshiUtil;
 import com.unclezs.constrant.Charsets;
 
 import java.io.BufferedInputStream;
@@ -20,7 +21,7 @@ import java.util.BitSet;
  * @date 2020/4/22 22:53
  */
 public class FileUtil {
-    private static int BYTE_SIZE = 8;
+    private static final int BYTE_SIZE = 8;
     private static final String CODE_UTF8 = Charsets.UTF8;
     private static final String CODE_UTF8_BOM = "UTF-8_BOM";
     private static final String CODE_GBK = Charsets.GBK;
@@ -119,9 +120,11 @@ public class FileUtil {
             String ext = cn.hutool.core.io.FileUtil.extName(target);
             //没有后缀的
             if (StrUtil.isBlank(ext)) {
-                return checkExistAndRename(cn.hutool.core.io.FileUtil.file(target.getParent(), String.format("%s_%s/", name, RandomUtil.randomString(3))), true);
+                return checkExistAndRename(cn.hutool.core.io.FileUtil.file(target.getParent(),
+                    String.format("%s_%s/", name, RandomUtil.randomString(3))), true);
             }
-            return checkExistAndRename(cn.hutool.core.io.FileUtil.file(target.getParent(), String.format("%s_%s.%s", name, RandomUtil.randomString(3), ext)), true);
+            return checkExistAndRename(cn.hutool.core.io.FileUtil.file(target.getParent(),
+                String.format("%s_%s.%s", name, RandomUtil.randomString(3), ext)), true);
         } else {
             return target;
         }

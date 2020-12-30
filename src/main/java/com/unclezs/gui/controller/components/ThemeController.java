@@ -43,7 +43,8 @@ public class ThemeController {
             headerColorPicker.setValue(Color.valueOf(DataManager.application.getAppTheme().getHeaderColor().get()));
         }
         headerColorPicker.setOnAction(e -> {
-            DataManager.application.getAppTheme().getHeaderColor().set(JFXNodeUtils.colorToHex(headerColorPicker.getValue()));
+            DataManager.application.getAppTheme().getHeaderColor().set(
+                JFXNodeUtils.colorToHex(headerColorPicker.getValue()));
             changeTheme();
         });
         //初始化透明度
@@ -89,18 +90,18 @@ public class ThemeController {
      */
     private void imageBind() {
         App.background.backgroundProperty().bind(
-                Bindings.createObjectBinding(() -> new Background(new BackgroundImage(
-                        new Image(DataManager.application.getAppTheme().getBgImage().get()),
-                        BackgroundRepeat.NO_REPEAT,
-                        BackgroundRepeat.NO_REPEAT,
-                        BackgroundPosition.CENTER,
-                        new BackgroundSize(-1, -1, true, true, false, true)
-                )), DataManager.application.getAppTheme().getBgImage()));
+            Bindings.createObjectBinding(() -> new Background(new BackgroundImage(
+                new Image(DataManager.application.getAppTheme().getBgImage().get()),
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(-1, -1, true, true, false, true)
+            )), DataManager.application.getAppTheme().getBgImage()));
         App.root.backgroundProperty().bind(Bindings.createObjectBinding(() ->
-                new Background(new BackgroundFill(
-                        Color.rgb(255, 255, 255, 1 - opacitySlider.getValue()),
-                        null,
-                        new Insets(5))), opacitySlider.valueProperty()));
+            new Background(new BackgroundFill(
+                Color.rgb(255, 255, 255, 1 - opacitySlider.getValue()),
+                null,
+                new Insets(5))), opacitySlider.valueProperty()));
     }
 
 
@@ -110,10 +111,11 @@ public class ThemeController {
     private void colorBind() {
         App.root.backgroundProperty().bind(App.background.backgroundProperty());
         App.background.backgroundProperty().bind(Bindings.createObjectBinding(() ->
-                new Background(new BackgroundFill(
-                        Color.color(colorPicker.getValue().getRed(), colorPicker.getValue().getGreen(), colorPicker.getValue().getBlue(), 1 - opacitySlider.getValue()),
-                        null,
-                        new Insets(5))), color, opacitySlider.valueProperty()));
+            new Background(new BackgroundFill(
+                Color.color(colorPicker.getValue().getRed(), colorPicker.getValue().getGreen(),
+                    colorPicker.getValue().getBlue(), 1 - opacitySlider.getValue()),
+                null,
+                new Insets(5))), color, opacitySlider.valueProperty()));
     }
 
 
@@ -122,10 +124,10 @@ public class ThemeController {
      */
     private void changeTheme() {
         ThemeUtil.setCss(Dict.create().set("bgImage", DataManager.application.getAppTheme().getBgImage().get())
-                        .set("bgColor", Color.TRANSPARENT.equals(color.get()) ? "transparent" : JFXNodeUtils.colorToHex(color.get()))
-                        .set("headerColor", DataManager.application.getAppTheme().getHeaderColor().get())
-                        .set("fontColor", DataManager.application.getAppTheme().getFontColor().get()),
-                App.stage.getScene(), "css/theme.ftl", "/theme/theme.css");
+                .set("bgColor", Color.TRANSPARENT.equals(color.get()) ? "transparent" : JFXNodeUtils.colorToHex(color.get()))
+                .set("headerColor", DataManager.application.getAppTheme().getHeaderColor().get())
+                .set("fontColor", DataManager.application.getAppTheme().getFontColor().get()),
+            App.stage.getScene(), "css/theme.ftl", "/theme/theme.css");
     }
 
     /**
@@ -134,7 +136,8 @@ public class ThemeController {
     public void applyBgImage() {
         if (StrUtil.isNotEmpty(DataManager.application.getAppTheme().getBgImage().get())) {
             headerColorPicker.setValue(color.get());
-            DataManager.application.getAppTheme().getHeaderColor().set(JFXNodeUtils.colorToHex(headerColorPicker.getValue()));
+            DataManager.application.getAppTheme().getHeaderColor().set(
+                JFXNodeUtils.colorToHex(headerColorPicker.getValue()));
             changeTheme();
             color.set(Color.TRANSPARENT);
             transparentHeader();
